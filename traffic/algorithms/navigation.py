@@ -842,7 +842,6 @@ class NavigationFeatures:
                     if scaler is None
                     else scaler.transform(tracks)
                 )
-
                 embeddings = None
 
                 if embedding_model is not None:
@@ -870,11 +869,10 @@ class NavigationFeatures:
                                 0
                             ].name: embeddings.astype(np.float32)
                         },
-                    )[0]
+                    )[0][0][0]
                     if clustering_model is None
                     else clustering_model.predict(embeddings)
                 )
-
                 if c in chp:
                     if start is None:
                         start, stop = window.start, window.stop
@@ -883,6 +881,8 @@ class NavigationFeatures:
                     else:
                         yield self.between(start, stop)
                         start, stop = window.start, window.stop
+        if start is not None:
+            yield self.between(start, stop)  # type: ignore
 
     @flight_iterator
     def holding_pattern_back(
